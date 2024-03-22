@@ -2,7 +2,10 @@
 {
     public class User_Role
     {
-        public Users? Role_id { get; set; }
-        public Roles? User_id { get; set; }
+        public int Role_id { get; set; }
+        public Guid User_id { get; set; }
+
+        public Users user { get; set; }
+        public Roles role { get; set; }
     }
 }

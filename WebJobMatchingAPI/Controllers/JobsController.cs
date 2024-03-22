@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebJobMatchingAPI.Data;
+using WebJobMatchingAPI.DTO;
 using WebJobMatchingAPI.Entities;
 
 namespace WebJobMatchingAPI.Controllers
@@ -23,81 +25,93 @@ namespace WebJobMatchingAPI.Controllers
 
         // GET: api/Jobs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Jobs>>> GetJobs()
+        public async Task<ActionResult<IEnumerable<Jobs>>> GetAll ()
         {
             return await _context.Jobs.ToListAsync();
         }
 
         // GET: api/Jobs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Jobs>> GetJobs(Guid id)
+        public async Task<ActionResult<Jobs>> GetById(Guid id)
         {
-            var jobs = await _context.Jobs.FindAsync(id);
-
-            if (jobs == null)
-            {
-                return NotFound();
-            }
-
-            return jobs;
-        }
-
-        // PUT: api/Jobs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutJobs(Guid id, Jobs jobs)
-        {
-            if (id != jobs.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(jobs).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!JobsExists(id))
+                var jobs = await _context.Jobs.FindAsync(id);
+
+                if (jobs == null)
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                return jobs;
+            } catch { return BadRequest(); }
         }
 
         // POST: api/Jobs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Jobs>> PostJobs(Jobs jobs)
+        public async Task<ActionResult<Jobs>> Create(JobsDTO jobDTO)
         {
-            _context.Jobs.Add(jobs);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var job = new Jobs
+                {
+                    Name = jobDTO.Name,
+                };
+                _context.Jobs.Add(job);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetJobs", new { id = jobs.Id }, jobs);
+                return Ok(job);
+            } catch { return BadRequest(); }
+        }
+
+
+        // PUT: api/Jobs/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, JobsDTO jobDTO)
+        {
+            try
+            {
+                var job = await _context.Jobs.FindAsync(id);
+                if (job != null)
+                {
+                    _context.Entry(job).State = EntityState.Modified;
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!JobsExists(id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return NoContent();
+                }
+                else { return NotFound(); }
+            } catch { return BadRequest(); }
         }
 
         // DELETE: api/Jobs/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteJobs(Guid id)
+        public async Task<IActionResult> SoftDelete(Guid id)
         {
-            var jobs = await _context.Jobs.FindAsync(id);
-            if (jobs == null)
+            try
             {
-                return NotFound();
-            }
+                var jobs = await _context.Jobs.FindAsync(id);
+                if (jobs == null)
+                {
+                    return NotFound();
+                }
+                jobs.IsDelete = true;
+                await _context.SaveChangesAsync();
 
-            _context.Jobs.Remove(jobs);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                return NoContent();
+            } catch { return BadRequest(); }
         }
 
         private bool JobsExists(Guid id)

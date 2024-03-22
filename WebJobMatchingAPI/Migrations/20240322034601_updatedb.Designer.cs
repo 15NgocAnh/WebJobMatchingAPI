@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebJobMatchingAPI.Data;
 
@@ -11,9 +12,11 @@ using WebJobMatchingAPI.Data;
 namespace WebJobMatchingAPI.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240322034601_updatedb")]
+    partial class updatedb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,9 +42,6 @@ namespace WebJobMatchingAPI.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
@@ -81,35 +81,11 @@ namespace WebJobMatchingAPI.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("role");
-                });
-
-            modelBuilder.Entity("WebJobMatchingAPI.Entities.Skills", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid?>("UsersID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsersID");
-
-                    b.ToTable("skills");
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.User_Role", b =>
@@ -180,25 +156,22 @@ namespace WebJobMatchingAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Skills")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 
                     b.HasIndex("JobsId");
 
                     b.ToTable("users");
-                });
-
-            modelBuilder.Entity("WebJobMatchingAPI.Entities.Skills", b =>
-                {
-                    b.HasOne("WebJobMatchingAPI.Entities.Users", null)
-                        .WithMany("Skills")
-                        .HasForeignKey("UsersID");
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.User_Role", b =>
@@ -242,8 +215,6 @@ namespace WebJobMatchingAPI.Migrations
             modelBuilder.Entity("WebJobMatchingAPI.Entities.Users", b =>
                 {
                     b.Navigation("Roles");
-
-                    b.Navigation("Skills");
                 });
 #pragma warning restore 612, 618
         }

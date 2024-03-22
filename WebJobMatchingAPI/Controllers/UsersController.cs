@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,14 +25,14 @@ namespace WebJobMatchingAPI.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers()
+        public async Task<ActionResult<IEnumerable<Users>>> GetAll()
         {
             return Ok(await _context.Users.ToListAsync());
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Users>> GetUserById(Guid id)
+        public async Task<ActionResult<Users>> GetById(Guid id)
         {
             try
             {
@@ -45,9 +46,33 @@ namespace WebJobMatchingAPI.Controllers
             }
         }
 
+
+        // POST: api/Users
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<Users>> create(UsersDTO userDTO)
+        {
+            var newUser = new Users
+            {
+                ID = Guid.NewGuid(),
+                Password = userDTO.Password,
+                FirstName = userDTO.FirstName,
+                LastName = userDTO.LastName,
+                Email = userDTO.Email,
+                UserName = userDTO.UserName,
+
+            };
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            return Ok(newUser);
+        }
+
+
         // PUT: api/Users/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserById(Guid id, UsersDTO userDTO)
+        [Authorize]
+        public async Task<IActionResult> Update(Guid id, UsersDTO userDTO)
         {
             try
             {
@@ -63,15 +88,8 @@ namespace WebJobMatchingAPI.Controllers
                 user.FirstName = userDTO.FirstName;
                 user.LastName = userDTO.LastName;
                 user.Email = userDTO.Email;
-                user.BirthDay = userDTO.BirthDay;
-                user.PhoneNumber = userDTO.PhoneNumber;
-                user.UserName = userDTO.UserName;
                 user.Password = userDTO.Password;
-                user.IsDeleted = userDTO.IsDeleted;
-                user.IsLocked = userDTO.IsLocked;
-                user.IsMale = userDTO.IsMale;
-                user.Skills = userDTO.Skills;
-                user.Education = userDTO.Education;
+                user.UserName = userDTO.UserName;
 
                 // Thiết lập trạng thái của đối tượng user thành Modified
                 _context.Entry(user).State = EntityState.Modified;
@@ -93,51 +111,33 @@ namespace WebJobMatchingAPI.Controllers
                 }
                 // Update xong thi tra ve trang thai nocontent
                 return NoContent();
-            } catch
+            }
+            catch
             {
                 return BadRequest();
             }
         }
 
-        // POST: api/Users
-        [HttpPost]
-        public async Task<ActionResult<Users>> createUser(UsersDTO userDTO)
+        // PUT: api/Users/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> SoftDelete(Guid id)
         {
             try
             {
-                var newUser = new Users
+                var users = await _context.Users.FindAsync(id);
+                if (users == null)
                 {
-                    ID = Guid.NewGuid(),
-                    Password = userDTO.Password,
-                    FirstName = userDTO.FirstName,
-                    LastName = userDTO.LastName,
-                    Email = userDTO.Email,
-                    PhoneNumber = userDTO.PhoneNumber,
-                    UserName = userDTO.UserName,
-
-                };
-                _context.Users.Add(newUser);
+                    return NotFound();
+                }
+                users.IsDeleted = true;
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetUsers", newUser);
+                return NoContent();
             }
-            catch {  return BadRequest(); }
-        }
-
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUsers(Guid id)
-        {
-            var users = await _context.Users.FindAsync(id);
-            if (users == null)
+            catch
             {
-                return NotFound();
+                return BadRequest();
             }
-
-            _context.Users.Remove(users);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool UsersExists(Guid id)
