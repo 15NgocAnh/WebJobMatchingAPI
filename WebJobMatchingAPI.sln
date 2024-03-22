@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebJobMatchingAPI", "WebJobMatchingAPI\WebJobMatchingAPI.csproj", "{ACC482AC-CC72-4E67-AC8D-1DA5ED2C9C22}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACC482AC-CC72-4E67-AC8D-1DA5ED2C9C22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACC482AC-CC72-4E67-AC8D-1DA5ED2C9C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACC482AC-CC72-4E67-AC8D-1DA5ED2C9C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACC482AC-CC72-4E67-AC8D-1DA5ED2C9C22}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A970DF69-157E-43FB-B436-9B2C7AA17CB7}
+	EndGlobalSection
+EndGlobal
