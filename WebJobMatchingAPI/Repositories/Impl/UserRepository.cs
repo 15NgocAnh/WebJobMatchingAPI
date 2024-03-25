@@ -1,9 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Immutable;
+using System.Drawing.Printing;
+using System.Security.Cryptography;
+using System.Text;
 using WebJobMatchingAPI.Data;
 using WebJobMatchingAPI.DTO;
 using WebJobMatchingAPI.Entities;
+using WebJobMatchingAPI.Utils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WebJobMatchingAPI.Repositories.Impl
 {
@@ -11,6 +17,8 @@ namespace WebJobMatchingAPI.Repositories.Impl
     {
         private readonly DBContext _context;
         private readonly IMapper _mapper;
+
+        public static int PAGE_SIZE { get; set; } = 3;
 
         public UserRepository(DBContext context, IMapper mapper) 
         { 
@@ -21,7 +29,6 @@ namespace WebJobMatchingAPI.Repositories.Impl
         public async Task<List<UsersDTO>> findAll()
         {
             var listUsers = await _context.Users!
-                .Select(u => new {u.FirstName, u.LastName, u.Email, u.Password, u.UserName, u.IsDeleted})
                 .Where(u => u.IsDeleted == false)
                 .ToListAsync(); ;
             return _mapper.Map<List<UsersDTO>>(listUsers);
@@ -33,13 +40,28 @@ namespace WebJobMatchingAPI.Repositories.Impl
             return _mapper.Map<UsersDTO>(user);
         }
 
-        public async Task<Guid> save(UsersDTO userDTO)
+        public async Task<UsersDTO> save(UsersDTO userDTO)
         {
             var user = _mapper.Map<Users>(userDTO);
                 user.ID = Guid.NewGuid();
+
+            //to hash password
+            byte[] salt = new byte[128 / 8];
+            using (var rngCsp = new RNGCryptoServiceProvider())
+            {
+                rngCsp.GetNonZeroBytes(salt);
+            }
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: user.Password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+            user.Password = hashed;
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return user.ID;
+            return _mapper.Map<UsersDTO>(user);
         }
 
         public async Task update(Guid id, UsersDTO userDTO)
@@ -70,6 +92,45 @@ namespace WebJobMatchingAPI.Repositories.Impl
                 user.IsDeleted = false;
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<List<UsersDTO>> search(string? keyword, string? sortBy, bool? gender, int? pageNumber) // true: male, false: female
+        {
+            var listUsers = _context.Users.AsQueryable();
+
+            #region searching
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                listUsers = listUsers.Where(u => u.FirstName.Contains(keyword) || u.LastName.Contains(keyword));
+            }
+            #endregion
+
+            #region sorting
+            //default sorting by name
+            listUsers = listUsers.OrderBy(u => u.FirstName + u.LastName);
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch(sortBy)
+                {
+                    case "location_desc": listUsers = listUsers.OrderByDescending(u => u.Location); break;
+                    case "education_asc": listUsers = listUsers.OrderBy(u => u.Education); break;
+                }
+            }
+            #endregion
+
+            #region filtering
+            if(gender != null)
+            {
+                listUsers = listUsers.Where(u => u.IsMale == gender);
+            }
+            #endregion
+
+            #region paging
+            var result = await PaginatedList<Users>.CreateAsync(listUsers, pageNumber ?? 1, PAGE_SIZE);
+            #endregion
+
+            List<UsersDTO> listUsersDTO = _mapper.Map<List<UsersDTO>>(result);
+            return listUsersDTO;
         }
 
     }

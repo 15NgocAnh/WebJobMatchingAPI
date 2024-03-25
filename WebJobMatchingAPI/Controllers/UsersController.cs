@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.IdentityModel.Tokens;
 using WebJobMatchingAPI.Constants;
 using WebJobMatchingAPI.Data;
@@ -51,8 +52,9 @@ namespace WebJobMatchingAPI.Controllers
                     Data = listUsers
                 });
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return BadRequest(new APIResponse
                 {
                     Success = false,
@@ -100,8 +102,8 @@ namespace WebJobMatchingAPI.Controllers
         {
             try
             {
-                var userId = await _userRepo.save(userDTO);
-                if (userId == null)
+                var user = await _userRepo.save(userDTO);
+                if (user == null)
                 {
                     return BadRequest(new APIResponse
                     {
@@ -109,26 +111,25 @@ namespace WebJobMatchingAPI.Controllers
                         Message = "Create new user not successfully!"
                     });
                 }
-                return Created(new APIResponse
+                else
                 {
-                    Success = true,
-                    Message = "Create new user successfully!",
-                    Data = userId
-                });
+                    return Ok(new APIResponse
+                    {
+                        Success = true,
+                        Message = "Create new user successfully!",
+                        Data = user
+                    });
+                }
             }
-            catch
+            catch(Exception e) 
             {
+                Console.WriteLine(e);
                 return BadRequest(new APIResponse
                 {
                     Success = false,
-                    Message = Constants.Constants.SOMETHING_WENT_WRONG
-                });
+                    Message = Constants.Constants.SOMETHING_WENT_WRONG,
+                }); 
             }
-        }
-
-        private ActionResult<Users> Created(APIResponse aPIResponse)
-        {
-            throw new NotImplementedException();
         }
 
 
@@ -203,6 +204,39 @@ namespace WebJobMatchingAPI.Controllers
             catch
             {
                 return BadRequest();
+            }
+        }
+
+        [Route("/Search")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Users>>> search(string? keyword, string? sortBy, bool? gender, int pageNumber)
+        {
+            try
+            {
+                var listUsers = await _userRepo.search(keyword,sortBy,gender,pageNumber);
+                if (listUsers.IsNullOrEmpty())
+                {
+                    return Ok(new APIResponse
+                    {
+                        Success = true,
+                        Message = "Don't have any users in DB"
+                    });
+                }
+                return Ok(new APIResponse
+                {
+                    Success = true,
+                    Message = "Get all users successfully",
+                    Data = listUsers
+                });
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = Constants.Constants.SOMETHING_WENT_WRONG
+                });
             }
         }
 

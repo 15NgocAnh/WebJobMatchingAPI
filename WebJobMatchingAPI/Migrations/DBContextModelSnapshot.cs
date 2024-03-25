@@ -86,7 +86,7 @@ namespace WebJobMatchingAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("role");
+                    b.ToTable("role", (string)null);
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.Skills", b =>
@@ -109,7 +109,7 @@ namespace WebJobMatchingAPI.Migrations
 
                     b.HasIndex("UsersID");
 
-                    b.ToTable("skills");
+                    b.ToTable("skills", (string)null);
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.User_Role", b =>

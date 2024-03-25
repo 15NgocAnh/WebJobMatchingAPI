@@ -14,7 +14,7 @@ namespace WebJobMatchingAPI.DTO
 
         [Required]
         [MinLength(8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, and one digit.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, and one digit.")]
         public string? Password { get; set; }
 
         [Required]
@@ -24,7 +24,7 @@ namespace WebJobMatchingAPI.DTO
         [Required]
         [StringLength(50)]
         public string UserName { get; set; }
-
+        public bool IsDeleted { get; set; }
     }
 
 }

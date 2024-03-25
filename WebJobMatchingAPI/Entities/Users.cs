@@ -4,6 +4,7 @@ using System.Data;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using WebJobMatchingAPI.DTO;
+using System.Reflection.Metadata;
 
 namespace WebJobMatchingAPI.Entities
 {
@@ -23,7 +24,7 @@ namespace WebJobMatchingAPI.Entities
 
         [Required]
         [MinLength(8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, and one digit.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, and one digit.")]
         public string? Password { get; set; }
 
         [Required]
@@ -36,6 +37,9 @@ namespace WebJobMatchingAPI.Entities
 
         public string? PhoneNumber { get; set; }
         public DateOnly BirthDay { get; set; }
+
+        
+        //public Blob image { get; set; }
         public List<Skills> Skills { get; set; }
         public string? Experience { get; set; }
         public string? Education { get; set; }
