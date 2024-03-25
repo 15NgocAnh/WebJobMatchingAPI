@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using WebJobMatchingAPI.Constants;
 using WebJobMatchingAPI.Data;
 using WebJobMatchingAPI.DTO;
 using WebJobMatchingAPI.Entities;
+using WebJobMatchingAPI.Repositories;
+using WebJobMatchingAPI.Utils;
 
 namespace WebJobMatchingAPI.Controllers
 {
@@ -17,17 +21,44 @@ namespace WebJobMatchingAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DBContext _context;
+        private readonly IUserRepository _userRepo;
 
-        public UsersController(DBContext context)
+        public UsersController(DBContext context, IUserRepository userRepository)
         {
             _context = context;
+            _userRepo = userRepository;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Users>>> GetAll()
         {
-            return Ok(await _context.Users.ToListAsync());
+            try
+            {
+                var listUsers = await _userRepo.findAll();
+                if (listUsers.IsNullOrEmpty())
+                {
+                    return Ok(new APIResponse
+                    {
+                        Success = true,
+                        Message = "Don't have any users in DB"
+                    }); 
+                }
+                return Ok(new APIResponse
+                {
+                    Success = true,
+                    Message = "Get all users successfully",
+                    Data = listUsers
+                });
+            }
+            catch
+            {
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = Constants.Constants.SOMETHING_WENT_WRONG
+                });
+            }
         }
 
         // GET: api/Users/5
@@ -36,42 +67,73 @@ namespace WebJobMatchingAPI.Controllers
         {
             try
             {
-                var user = await _context.Users.FindAsync(id);
-                if (user == null) return NotFound();
-                return user;
+                var user = await _userRepo.findById(id);
+                if (user == null)
+                {
+                    return NotFound(new APIResponse
+                    {
+                        Success = false,
+                        Message = "User not found"
+                    });
+                }
+                return Ok(new APIResponse
+                {
+                    Success = true,
+                    Message = "Get user by id successfully!",
+                    Data = user
+                });
             }
             catch
             {
-                return BadRequest();
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = Constants.Constants.SOMETHING_WENT_WRONG
+                });
             }
         }
 
 
         // POST: api/Users
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<Users>> create(UsersDTO userDTO)
         {
-            var newUser = new Users
+            try
             {
-                ID = Guid.NewGuid(),
-                Password = userDTO.Password,
-                FirstName = userDTO.FirstName,
-                LastName = userDTO.LastName,
-                Email = userDTO.Email,
-                UserName = userDTO.UserName,
+                var userId = await _userRepo.save(userDTO);
+                if (userId == null)
+                {
+                    return BadRequest(new APIResponse
+                    {
+                        Success = false,
+                        Message = "Create new user not successfully!"
+                    });
+                }
+                return Created(new APIResponse
+                {
+                    Success = true,
+                    Message = "Create new user successfully!",
+                    Data = userId
+                });
+            }
+            catch
+            {
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = Constants.Constants.SOMETHING_WENT_WRONG
+                });
+            }
+        }
 
-            };
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
-
-            return Ok(newUser);
+        private ActionResult<Users> Created(APIResponse aPIResponse)
+        {
+            throw new NotImplementedException();
         }
 
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
-        [Authorize]
         public async Task<IActionResult> Update(Guid id, UsersDTO userDTO)
         {
             try
@@ -114,7 +176,11 @@ namespace WebJobMatchingAPI.Controllers
             }
             catch
             {
-                return BadRequest();
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = Constants.Constants.SOMETHING_WENT_WRONG
+                });
             }
         }
 

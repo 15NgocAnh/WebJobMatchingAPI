@@ -19,6 +19,7 @@ namespace WebJobMatchingAPI.Data
         public DbSet<WebJobMatchingAPI.Entities.Roles> Roles { get; set; }
 
         public DbSet<WebJobMatchingAPI.Entities.User_Role> User_Role { get; set; }
+        public DbSet<WebJobMatchingAPI.Entities.Skills> Skills { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +28,12 @@ namespace WebJobMatchingAPI.Data
                 u.ToTable("jobs");
                 u.HasKey(j => j.Id);
                 u.Property(d => d.Created).HasDefaultValueSql("getutcdate()");
+            });
+
+            modelBuilder.Entity<Users>(u =>
+            {
+                u.HasIndex(e => e.Email).IsUnique();
+                u.HasIndex(u => u.UserName).IsUnique();
             });
 
             modelBuilder.Entity<User_Role>(ur =>

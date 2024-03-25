@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Text;
 using WebJobMatchingAPI.Data;
 using WebJobMatchingAPI.DTO;
+using WebJobMatchingAPI.Mappers;
 using WebJobMatchingAPI.Repositories;
 using WebJobMatchingAPI.Repositories.Impl;
 
@@ -23,11 +24,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//set Cors
+builder.Services.AddCors(opt => opt.AddDefaultPolicy(policy =>
+    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+
+//set autoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.Configure<AppSetting>(Configuration.GetSection("AppSettings"));
 
 var secretKey = Configuration["AppSettings:SecretKey"];
 var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+//Life Cycle DI: AddSingleton(),  AddTransident(), AddScoped()
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(jwt =>
 {
@@ -55,7 +65,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

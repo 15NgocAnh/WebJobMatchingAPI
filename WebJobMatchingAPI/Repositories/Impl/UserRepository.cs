@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
 using WebJobMatchingAPI.Data;
 using WebJobMatchingAPI.DTO;
 using WebJobMatchingAPI.Entities;
@@ -8,78 +10,67 @@ namespace WebJobMatchingAPI.Repositories.Impl
     public class UserRepository : IUserRepository
     {
         private readonly DBContext _context;
-        public UserRepository(DBContext context) 
+        private readonly IMapper _mapper;
+
+        public UserRepository(DBContext context, IMapper mapper) 
         { 
             _context = context;
+            _mapper = mapper;
         }
 
-        public List<UsersDTO> findAll()
+        public async Task<List<UsersDTO>> findAll()
         {
-            var listUsers = _context.Users.Select(u => new UsersDTO
-            {
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                UserName = u.UserName,
-                Password = u.Password
-            });
-            return listUsers.ToList();
+            var listUsers = await _context.Users!
+                .Select(u => new {u.FirstName, u.LastName, u.Email, u.Password, u.UserName, u.IsDeleted})
+                .Where(u => u.IsDeleted == false)
+                .ToListAsync(); ;
+            return _mapper.Map<List<UsersDTO>>(listUsers);
         }
 
-        public UsersDTO findById(Guid id)
+        public async Task<UsersDTO> findById(Guid id)
         {
-            var user = _context.Users.SingleOrDefault(u => u.ID == id);
-            if (user == null)
-            {
-                return null;
-            }
-            return new UsersDTO
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                UserName = user.UserName,
-                Password = user.Password
-            };
+            var user = await _context.Users!.FindAsync(id);
+            return _mapper.Map<UsersDTO>(user);
         }
 
-        public UsersDTO save(UsersDTO userDTO)
+        public async Task<Guid> save(UsersDTO userDTO)
         {
-            var user = new Users
-            {
-                ID = Guid.NewGuid(),
-                FirstName = userDTO.FirstName,
-                LastName = userDTO.LastName,
-                Email = userDTO.Email,
-                UserName = userDTO.UserName,
-                Password = userDTO.Password
-            };
+            var user = _mapper.Map<Users>(userDTO);
+                user.ID = Guid.NewGuid();
             _context.Users.Add(user);
-            return userDTO;
+            await _context.SaveChangesAsync();
+            return user.ID;
         }
 
-        public void update(Guid id, UsersDTO userDTO)
+        public async Task update(Guid id, UsersDTO userDTO)
         {
-            var user = _context.Users.SingleOrDefault(u => u.ID == id);
+            var user = await _context.Users!.SingleOrDefaultAsync(u => u.ID == id);
             if (user != null)
             {
-                user.FirstName = userDTO.FirstName;
-                user.LastName = userDTO.LastName;
-                user.Email = userDTO.Email;
-                user.UserName = userDTO.UserName;
-                user.Password = userDTO.Password;
-                _context.SaveChangesAsync();
-            };
+                _context.Users.Update(_mapper.Map<Users>(userDTO));
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public void delete(Guid id)
+        public async Task delete(Guid id)
         {
-            var user = _context.Users.SingleOrDefault(u => u.ID == id);
+            var user = await _context.Users!.SingleOrDefaultAsync(u => u.ID == id);
             if (user != null)
             {
                 user.IsDeleted = true;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
+
+        public async Task active(Guid id)
+        {
+            var user = await _context.Users!.SingleOrDefaultAsync(u => u.ID == id);
+            if (user != null)
+            {
+                user.IsDeleted = false;
+                await _context.SaveChangesAsync();
+            }
+        }
+
     }
 }
