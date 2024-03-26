@@ -23,6 +23,11 @@ namespace WebJobMatchingAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //modelBuilder.Entity<Users>(u => u.HasData(new Users
+            //{
+
+            //}));
+
             modelBuilder.Entity<Jobs>(u =>
             {
                 u.ToTable("jobs");

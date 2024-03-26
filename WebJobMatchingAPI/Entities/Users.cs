@@ -48,7 +48,7 @@ namespace WebJobMatchingAPI.Entities
         public bool IsMale { get; set; }
         public bool IsLocked { get; set; } = false;
         public bool IsDeleted { get; set; } = false;
-        public IList<User_Role> Roles { get; set; }
+        public List<User_Role> Roles { get; set; }
 
     }
 
