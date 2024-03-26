@@ -1,10 +1,18 @@
-﻿using WebJobMatchingAPI.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using WebJobMatchingAPI.Entities;
 
 namespace WebJobMatchingAPI.Data
 {
     public class DBInitialer
     {
-        public static void Seed(IApplicationBuilder applicationBuilder)
+        private readonly ModelBuilder modelBuilder;
+
+        public DBInitialer(ModelBuilder modelBuilder)
+        {
+            this.modelBuilder = modelBuilder;
+        }
+
+        public void Seed(IApplicationBuilder applicationBuilder)
         {
             using(var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
             {

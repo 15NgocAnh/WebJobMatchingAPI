@@ -23,6 +23,7 @@ namespace WebJobMatchingAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            new DBInitialer(modelBuilder).Seed();
             //modelBuilder.Entity<Users>(u => u.HasData(new Users
             //{
 
