@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using WebJobMatchingAPI.DTO;
 using WebJobMatchingAPI.Entities;
 
 namespace WebJobMatchingAPI.Data
@@ -20,6 +21,7 @@ namespace WebJobMatchingAPI.Data
 
         public DbSet<WebJobMatchingAPI.Entities.User_Role> User_Role { get; set; }
         public DbSet<WebJobMatchingAPI.Entities.Skills> Skills { get; set; }
+        public DbSet<UsersViewModel> UsersViewModel { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -96,6 +98,10 @@ namespace WebJobMatchingAPI.Data
             //modelBuilder.Entity<User_Role>.HasData(
             //    new User_Role() { i}
             //);
+
+            modelBuilder
+                .Entity<UsersViewModel>()
+                .ToView(nameof(UsersViewModel)).HasNoKey();
 
             modelBuilder.Entity<Jobs>(u =>
             {

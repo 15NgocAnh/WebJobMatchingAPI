@@ -32,7 +32,7 @@ namespace WebJobMatchingAPI.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Users>>> GetAll()
+        public async Task<ActionResult<IEnumerable<UsersViewModel>>> GetAll()
         {
             try
             {
@@ -70,6 +70,38 @@ namespace WebJobMatchingAPI.Controllers
             try
             {
                 var user = await _userRepo.findById(id);
+                if (user == null)
+                {
+                    return NotFound(new APIResponse
+                    {
+                        Success = false,
+                        Message = "User not found"
+                    });
+                }
+                return Ok(new APIResponse
+                {
+                    Success = true,
+                    Message = "Get user by id successfully!",
+                    Data = user
+                });
+            }
+            catch
+            {
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = Constants.Constants.SOMETHING_WENT_WRONG
+                });
+            }
+        }
+
+        [Route("/getUsersByName")]
+        [HttpGet]
+        public async Task<ActionResult<Users>> GetUsersByName(string name)
+        {
+            try
+            {
+                var user = await _userRepo.getUsersByName(name);
                 if (user == null)
                 {
                     return NotFound(new APIResponse

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebJobMatchingAPI.Data;
 
@@ -11,9 +12,11 @@ using WebJobMatchingAPI.Data;
 namespace WebJobMatchingAPI.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240327072643_view")]
+    partial class view
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,35 +24,6 @@ namespace WebJobMatchingAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("WebJobMatchingAPI.DTO.UsersViewModel", b =>
-                {
-                    b.Property<DateOnly>("BirthDay")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("UsersViewModel", (string)null);
-                });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.Jobs", b =>
                 {
@@ -259,7 +233,7 @@ namespace WebJobMatchingAPI.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("e1e8c073-2234-4b51-8ea4-4c0f8b85c38d"),
+                            ID = new Guid("fc479e06-63d4-4d4f-8388-ed5b93318f0f"),
                             BirthDay = new DateOnly(1990, 1, 1),
                             Education = "Bachelor's Degree",
                             Email = "johndoe@example.com",
@@ -277,7 +251,7 @@ namespace WebJobMatchingAPI.Migrations
                         },
                         new
                         {
-                            ID = new Guid("b90f48b3-8a17-4563-8779-0e45e32bbd45"),
+                            ID = new Guid("273506a2-6525-49ae-93dd-b841f37a3e8c"),
                             BirthDay = new DateOnly(2002, 1, 15),
                             Education = "Hue University",
                             Email = "nguyenvana@gmail.com",
@@ -295,7 +269,7 @@ namespace WebJobMatchingAPI.Migrations
                         },
                         new
                         {
-                            ID = new Guid("629fb61b-faad-471c-a3dc-329bb1e7c6d0"),
+                            ID = new Guid("167caa8d-f865-4748-9189-4a1ab422f467"),
                             BirthDay = new DateOnly(2002, 1, 15),
                             Education = "Hue University",
                             Email = "nguyenthib123@gmail.com",

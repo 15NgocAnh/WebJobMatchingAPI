@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Drawing.Printing;
 using System.Security.Cryptography;
@@ -26,12 +27,17 @@ namespace WebJobMatchingAPI.Repositories.Impl
             _mapper = mapper;
         }
 
-        public async Task<List<UsersDTO>> findAll()
+        public async Task<List<UsersDTO>> findAllActive()
         {
             var listUsers = await _context.Users!
                 .Where(u => u.IsDeleted == false)
                 .ToListAsync(); ;
             return _mapper.Map<List<UsersDTO>>(listUsers);
+        }
+
+        public async Task<List<UsersViewModel>> findAll()
+        {
+            return await _context.UsersViewModel.ToListAsync(); 
         }
 
         public async Task<UsersDTO> findById(Guid id)
@@ -133,5 +139,13 @@ namespace WebJobMatchingAPI.Repositories.Impl
             return listUsersDTO;
         }
 
+        public async Task<List<UsersDTO>> getUsersByName(string? name)
+        {
+            var users = await _context.Users
+                                    .FromSql($"getUsersByName {name}")
+                                    .ToListAsync();
+            List<UsersDTO> usersDTOs = _mapper.Map<List<UsersDTO>>(users);
+            return usersDTOs;
+        }
     }
 }
