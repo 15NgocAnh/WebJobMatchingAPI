@@ -4,6 +4,11 @@ using WebJobMatchingAPI.DTO;
 
 namespace WebJobMatchingAPI.Entities
 {
+    public enum Role
+    {
+        ROLE_ADMIN, ROLE_USER, ROLE_GUEST
+    };
+    
     [Table("role")]
     public class Roles 
     {
@@ -12,7 +17,7 @@ namespace WebJobMatchingAPI.Entities
 
         [Required]
         [StringLength(20)]
-        public string Name { get; set; }
+        public Role Name { get; set; }
         public IList<User_Role> Users { get; set; }
     }
 }

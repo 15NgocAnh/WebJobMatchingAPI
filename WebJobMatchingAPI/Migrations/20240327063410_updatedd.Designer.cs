@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebJobMatchingAPI.Data;
 
@@ -11,9 +12,11 @@ using WebJobMatchingAPI.Data;
 namespace WebJobMatchingAPI.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240327063410_updatedd")]
+    partial class updatedd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,7 +233,7 @@ namespace WebJobMatchingAPI.Migrations
                     b.HasData(
                         new
                         {
-                            ID = new Guid("18e006fb-1950-4865-8540-5578b7bc2f2b"),
+                            ID = new Guid("21fb9874-8cf9-4f20-b77c-0084f5ca98a3"),
                             BirthDay = new DateOnly(1990, 1, 1),
                             Education = "Bachelor's Degree",
                             Email = "johndoe@example.com",
@@ -248,7 +251,7 @@ namespace WebJobMatchingAPI.Migrations
                         },
                         new
                         {
-                            ID = new Guid("834a1713-c8b7-4abe-9758-2894b1a1f36a"),
+                            ID = new Guid("18319b6d-0948-43a0-b4f9-aed7d166eaae"),
                             BirthDay = new DateOnly(2002, 1, 15),
                             Education = "Hue University",
                             Email = "nguyenvana@gmail.com",
@@ -266,7 +269,7 @@ namespace WebJobMatchingAPI.Migrations
                         },
                         new
                         {
-                            ID = new Guid("1f2a577d-a57b-4cc0-a762-e1c3fa158ab4"),
+                            ID = new Guid("b243f8c4-ffa0-4fc6-8402-a8daefcd736d"),
                             BirthDay = new DateOnly(2002, 1, 15),
                             Education = "Hue University",
                             Email = "nguyenthib123@gmail.com",

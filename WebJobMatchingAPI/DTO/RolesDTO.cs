@@ -1,7 +1,9 @@
-﻿namespace WebJobMatchingAPI.DTO
+﻿using WebJobMatchingAPI.Entities;
+
+namespace WebJobMatchingAPI.DTO
 {
     public class RolesDTO
     {
-        public string Name { get; set; }
+        public Role Name { get; set; }
     }
 }
