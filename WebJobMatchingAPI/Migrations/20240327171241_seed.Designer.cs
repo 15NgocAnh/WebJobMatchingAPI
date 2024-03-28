@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebJobMatchingAPI.Data;
 
@@ -11,9 +12,11 @@ using WebJobMatchingAPI.Data;
 namespace WebJobMatchingAPI.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240327171241_seed")]
+    partial class seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,7 +117,7 @@ namespace WebJobMatchingAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("role", (string)null);
+                    b.ToTable("role");
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.Skills", b =>
@@ -137,7 +140,7 @@ namespace WebJobMatchingAPI.Migrations
 
                     b.HasIndex("UsersID");
 
-                    b.ToTable("skills", (string)null);
+                    b.ToTable("skills");
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.User_Role", b =>
@@ -225,7 +228,7 @@ namespace WebJobMatchingAPI.Migrations
                     b.HasIndex("UserName")
                         .IsUnique();
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.Skills", b =>

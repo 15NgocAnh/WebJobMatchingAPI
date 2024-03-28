@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebJobMatchingAPI.Data;
 
@@ -11,9 +12,11 @@ using WebJobMatchingAPI.Data;
 namespace WebJobMatchingAPI.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240327093211_add-procedure")]
+    partial class addprocedure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,7 +117,24 @@ namespace WebJobMatchingAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("role", (string)null);
+                    b.ToTable("role");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = 2
+                        });
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.Skills", b =>
@@ -137,7 +157,19 @@ namespace WebJobMatchingAPI.Migrations
 
                     b.HasIndex("UsersID");
 
-                    b.ToTable("skills", (string)null);
+                    b.ToTable("skills");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "BACKEND"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "FONTEND"
+                        });
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.User_Role", b =>
@@ -225,7 +257,63 @@ namespace WebJobMatchingAPI.Migrations
                     b.HasIndex("UserName")
                         .IsUnique();
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = new Guid("442da925-b4bc-41ba-b277-c8d0917595e1"),
+                            BirthDay = new DateOnly(1990, 1, 1),
+                            Education = "Bachelor's Degree",
+                            Email = "johndoe@example.com",
+                            Experience = "1 years as a Fontend Dev",
+                            FirstName = "John",
+                            IsDeleted = false,
+                            IsEmailConfirmed = false,
+                            IsLocked = false,
+                            IsMale = true,
+                            LastName = "Doe",
+                            Location = "New York",
+                            Password = "John123@doe",
+                            PhoneNumber = "+1 123-456-7890",
+                            UserName = "johndoe"
+                        },
+                        new
+                        {
+                            ID = new Guid("b00943d6-a50c-4a53-9b01-8b3e46e68c15"),
+                            BirthDay = new DateOnly(2002, 1, 15),
+                            Education = "Hue University",
+                            Email = "nguyenvana@gmail.com",
+                            Experience = "3 years as a Backend Developer",
+                            FirstName = "A",
+                            IsDeleted = false,
+                            IsEmailConfirmed = false,
+                            IsLocked = false,
+                            IsMale = true,
+                            LastName = "Nguyen Van",
+                            Location = "Hue, Viet Nam",
+                            Password = "12345NguyenA@",
+                            PhoneNumber = "086 3458 471",
+                            UserName = "nguyena123"
+                        },
+                        new
+                        {
+                            ID = new Guid("7dad4995-c714-4094-9767-a49acdfe5b9f"),
+                            BirthDay = new DateOnly(2002, 1, 15),
+                            Education = "Hue University",
+                            Email = "nguyenthib123@gmail.com",
+                            Experience = "4 years as a Backend Developer",
+                            FirstName = "B",
+                            IsDeleted = false,
+                            IsEmailConfirmed = false,
+                            IsLocked = false,
+                            IsMale = false,
+                            LastName = "Nguyen Thi",
+                            Location = "Hue, Viet Nam",
+                            Password = "12345ThiB@",
+                            PhoneNumber = "086 3643 874",
+                            UserName = "nguyenthib123"
+                        });
                 });
 
             modelBuilder.Entity("WebJobMatchingAPI.Entities.Skills", b =>
