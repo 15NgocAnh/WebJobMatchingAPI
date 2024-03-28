@@ -6,17 +6,15 @@ namespace WebJobMatchingAPI.Data
 {
     public class SeedData
     {
-        private static readonly DBContext context;
-
-        public static void Seed(ModelBuilder modelBuilder)
+        public static void Seed(IServiceProvider serviceProvider)
         {
-
-            if (!context.Users.Any())
+            using(var context = new DBContext(serviceProvider.GetRequiredService<DbContextOptions<DBContext>>()))
             {
-                modelBuilder.Entity<Users>().HasData(
+                var users = new List<Users>()
+                {
                     new Users()
                     {
-                        ID = Guid.NewGuid(),
+  
                         FirstName = "John",
                         LastName = "Doe",
                         UserName = "johndoe",
@@ -36,7 +34,6 @@ namespace WebJobMatchingAPI.Data
                     },
                     new Users()
                     {
-                        ID = Guid.NewGuid(),
                         FirstName = "A",
                         LastName = "Nguyen Van",
                         UserName = "nguyena123",
@@ -56,7 +53,6 @@ namespace WebJobMatchingAPI.Data
                     },
                     new Users()
                     {
-                        ID = Guid.NewGuid(),
                         FirstName = "B",
                         LastName = "Nguyen Thi",
                         UserName = "nguyenthib123",
@@ -74,24 +70,25 @@ namespace WebJobMatchingAPI.Data
                         IsMale = false,
                         Roles = null
                     }
-                );
-            }
+                };
+                if (!context.Users.Any()) {context.Users.AddRange(users); }
 
-            if (!context.Roles.Any())
-            {
-                modelBuilder.Entity<Roles>().HasData(
-                    new Roles { Id = 1, Name = Role.ROLE_ADMIN },
-                    new Roles { Id = 2, Name = Role.ROLE_USER },
-                    new Roles { Id = 3, Name = Role.ROLE_GUEST }
-                );
-            }
+                var roles = new List<Roles>()
+                {
+                    new Roles {Name = Role.ROLE_ADMIN },
+                    new Roles { Name = Role.ROLE_USER },
+                    new Roles { Name = Role.ROLE_GUEST }
+                };
+                if (!context.Roles.Any()) {context.Roles.AddRange(roles); }
 
-            if (!context.Skills.Any())
-            {
-                modelBuilder.Entity<Skills>().HasData(
-                    new Skills { Id = 1, Name = "BACKEND" },
-                    new Skills { Id = 2, Name = "FONTEND" }
-                );
+                var skills = new List<Skills>()
+                {
+                    new Skills { Name = "BACKEND" },
+                    new Skills { Name = "FONTEND" }
+                };
+                if (!context.Skills.Any()) { context.Skills.AddRange(skills); }
+
+                context.SaveChanges();
             }
         }
     }
